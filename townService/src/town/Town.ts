@@ -263,8 +263,16 @@ export default class Town {
    * with the specified ID or if there is no video URL specified
    */
   public addViewingArea(viewingArea: ViewingAreaModel): boolean {
-    // TODO Task 1
-    throw new Error('Unimplemented');
+    const area = this._interactables.find(
+      eachArea => eachArea.id === viewingArea.id,
+    ) as ViewingArea;
+    if (!area || !viewingArea.video || area.video) {
+      return false;
+    }
+    area.updateModel(viewingArea);
+    area.addPlayersWithinBounds(this._players);
+    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
+    return true;
   }
 
   /**

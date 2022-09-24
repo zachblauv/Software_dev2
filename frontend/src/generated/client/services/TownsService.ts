@@ -34,8 +34,8 @@ export class TownsService {
      * @throws ApiError
      */
     public createTown(
-        requestBody: TownCreateParams,
-    ): CancelablePromise<TownCreateResponse> {
+requestBody: TownCreateParams,
+): CancelablePromise<TownCreateResponse> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/towns',
@@ -49,14 +49,14 @@ export class TownsService {
      * @param townId town to update
      * @param xCoveyTownPassword town update password, must match the password returned by createTown
      * @param requestBody The updated settings
-     * @returns void
+     * @returns void 
      * @throws ApiError
      */
     public updateTown(
-        townId: string,
-        xCoveyTownPassword: string,
-        requestBody: TownSettingsUpdate,
-    ): CancelablePromise<void> {
+townId: string,
+xCoveyTownPassword: string,
+requestBody: TownSettingsUpdate,
+): CancelablePromise<void> {
         return this.httpRequest.request({
             method: 'PATCH',
             url: '/towns/{townID}',
@@ -78,13 +78,13 @@ export class TownsService {
      * Deletes a town
      * @param townId ID of the town to delete
      * @param xCoveyTownPassword town update password, must match the password returned by createTown
-     * @returns void
+     * @returns void 
      * @throws ApiError
      */
     public deleteTown(
-        townId: string,
-        xCoveyTownPassword: string,
-    ): CancelablePromise<void> {
+townId: string,
+xCoveyTownPassword: string,
+): CancelablePromise<void> {
         return this.httpRequest.request({
             method: 'DELETE',
             url: '/towns/{townID}',
@@ -105,14 +105,14 @@ export class TownsService {
      * @param townId ID of the town in which to create the new conversation area
      * @param xSessionToken session token of the player making the request, must match the session token returned when the player joined the town
      * @param requestBody The new conversation area to create
-     * @returns void
+     * @returns void 
      * @throws ApiError
      */
     public createConversationArea(
-        townId: string,
-        xSessionToken: string,
-        requestBody: ConversationArea,
-    ): CancelablePromise<void> {
+townId: string,
+xSessionToken: string,
+requestBody: ConversationArea,
+): CancelablePromise<void> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/towns/{townID}/conversationArea',
@@ -134,16 +134,16 @@ export class TownsService {
      * Creates a viewing area in a given town
      * @param townId ID of the town in which to create the new viewing area
      * @param xSessionToken session token of the player making the request, must
-     * match the session token returned when the player joined the town
+ * match the session token returned when the player joined the town
      * @param requestBody The new viewing area to create
-     * @returns void
+     * @returns void 
      * @throws ApiError
      */
     public createViewingArea(
-        townId: string,
-        xSessionToken: string,
-        requestBody: ViewingArea,
-    ): CancelablePromise<void> {
+townId: string,
+xSessionToken: string,
+requestBody: ViewingArea,
+): CancelablePromise<void> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/towns/{townID}/viewingArea',

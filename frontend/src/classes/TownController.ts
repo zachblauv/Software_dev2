@@ -656,7 +656,7 @@ export function usePlayers(): PlayerController[] {
  *
  * @throws Error if there is no viewing area controller matching the specifeid ID
  */
- export function useViewingAreaController(viewingAreaID: string): ViewingAreaController {
+export function useViewingAreaController(viewingAreaID: string): ViewingAreaController {
   const townController = useTownController();
   const ret = townController.viewingAreas.find(eachArea => eachArea.id === viewingAreaID);
   if (!ret) {

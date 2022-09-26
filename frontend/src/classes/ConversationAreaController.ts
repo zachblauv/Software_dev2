@@ -22,6 +22,12 @@ export const NO_TOPIC_STRING = '(No topic)';
  * frontend's. The ConversationAreaController emits events when the conversation area changes.
  */
 export default class ConversationAreaController extends (EventEmitter as new () => TypedEmitter<ConversationAreaEvents>) {
+  private _id: string;
+
+  private _topic: string | undefined;
+
+  private _occupants: PlayerController[];
+
   /**
    * Create a new ConversationAreaController
    * @param id
@@ -29,13 +35,29 @@ export default class ConversationAreaController extends (EventEmitter as new () 
    */
   constructor(id: string, topic?: string) {
     super();
+    this._id = id;
+    this._topic = topic;
+    this._occupants = [];
   }
 
   /**
    * The ID of this conversation area (read only)
    */
   get id(): string {
-    throw new Error('Unimplemented: Task 2 ConversationAreaController');
+    return this._id;
+  }
+
+  private _isSameOccupantsList(newOccupants: PlayerController[]): boolean {
+    if (this.occupants.length === newOccupants.length) {
+      const occupantsSet = new Set(this.occupants);
+      for (const player of newOccupants) {
+        if (!occupantsSet.has(player)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -43,11 +65,14 @@ export default class ConversationAreaController extends (EventEmitter as new () 
    * will emit an occupantsChange event.
    */
   set occupants(newOccupants: PlayerController[]) {
-    throw new Error('Unimplemented: Task 2 ConversationAreaController');
+    if (!this._isSameOccupantsList(newOccupants)) {
+      this._occupants = newOccupants;
+      this.emit('occupantsChange', this._occupants);
+    }
   }
 
   get occupants(): PlayerController[] {
-    throw new Error('Unimplemented: Task 2 ConversationAreaController');
+    return this._occupants;
   }
 
   /**
@@ -56,18 +81,21 @@ export default class ConversationAreaController extends (EventEmitter as new () 
    * Setting the topic to the value `undefined` will indicate that the conversation area is not active
    */
   set topic(newTopic: string | undefined) {
-    throw new Error('Unimplemented: Task 2 ConversationAreaController');
+    if (this._topic !== newTopic) {
+      this._topic = newTopic;
+      this.emit('topicChange', this._topic);
+    }
   }
 
   get topic(): string | undefined {
-    throw new Error('Unimplemented: Task 2 ConversationAreaController');
+    return this._topic;
   }
 
   /**
    * A conversation area is empty if there are no occupants in it, or the topic is undefined.
    */
   isEmpty(): boolean {
-    throw new Error('Unimplemented: Task 2 ConversationAreaController');
+    return this._topic === undefined || this._occupants.length === 0;
   }
 
   /**
@@ -75,7 +103,8 @@ export default class ConversationAreaController extends (EventEmitter as new () 
    * townService's representation and is suitable for transmitting over the network.
    */
   toConversationAreaModel(): ConversationAreaModel {
-    throw new Error('Unimplemented: Task 2 ConversationAreaController');
+    const occupantsByID = this._occupants.map(occupant => occupant.id);
+    return { id: this._id, topic: this._topic, occupantsByID };
   }
 
   /**

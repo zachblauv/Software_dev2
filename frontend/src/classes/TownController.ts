@@ -628,7 +628,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   private _updateViewingArea(viewingArea: ViewingAreaModel): void {
-    throw new Error('Unimplemented');
+    const areaController = this.viewingAreas.find(area => area.id === viewingArea.id);
+    if (areaController) {
+      areaController.updateFrom(viewingArea);
+    }
   }
 }
 

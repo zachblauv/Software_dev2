@@ -34,6 +34,7 @@ export type ViewingAreaEvents = {
  * emits updates when the state is updated, @see ViewingAreaEvents
  */
 export default class ViewingAreaController extends (EventEmitter as new () => TypedEventEmitter<ViewingAreaEvents>) {
+  private _viewingAreaModel: ViewingAreaModel;
 
   /**
    * Constructs a new ViewingAreaController, initialized with the state of the
@@ -43,6 +44,7 @@ export default class ViewingAreaController extends (EventEmitter as new () => Ty
    */
   constructor(viewingAreaModel: ViewingAreaModel) {
     super();
+    this._viewingAreaModel = viewingAreaModel;
   }
 
   /**
@@ -51,14 +53,14 @@ export default class ViewingAreaController extends (EventEmitter as new () => Ty
    * tied to the same viewing area ID.
    */
   public get id(): string {
-    throw new Error('Unimplemented: Task 2 ViewingAreaController');
+    return this._viewingAreaModel.id;
   }
 
   /**
    * The URL of the video assigned to this viewing area, or undefined if there is not one.
    */
-  public get video(): string {
-    throw new Error('Unimplemented: Task 2 ViewingAreaController');
+  public get video(): string | undefined {
+    return this._viewingAreaModel.video;
   }
 
   /**
@@ -67,14 +69,17 @@ export default class ViewingAreaController extends (EventEmitter as new () => Ty
    * Changing this value will emit a 'videoChange' event to listeners
    */
   public set video(video: string | undefined) {
-    throw new Error('Unimplemented: Task 2 ViewingAreaController');
+    if (video !== this._viewingAreaModel.video) {
+      this._viewingAreaModel.video = video;
+      this.emit('videoChange', video);
+    }
   }
 
   /**
    * The playback position of the video, in seconds (a floating point number)
    */
   public get elapsedTimeSec(): number {
-    throw new Error('Unimplemented: Task 2 ViewingAreaController');
+    return this._viewingAreaModel.elapsedTimeSec;
   }
 
   /**
@@ -83,7 +88,10 @@ export default class ViewingAreaController extends (EventEmitter as new () => Ty
    * Changing this value will emit a 'progressChange' event to listeners
    */
   public set elapsedTimeSec(elapsedTimeSec: number) {
-    throw new Error('Unimplemented: Task 2 ViewingAreaController');
+    if (this._viewingAreaModel.elapsedTimeSec !== elapsedTimeSec) {
+      this._viewingAreaModel.elapsedTimeSec = elapsedTimeSec;
+      this.emit('progressChange', elapsedTimeSec);
+    }
   }
 
   /**
@@ -91,7 +99,7 @@ export default class ViewingAreaController extends (EventEmitter as new () => Ty
    * that the video is paused.
    */
   public get isPlaying(): boolean {
-    throw new Error('Unimplemented: Task 2 ViewingAreaController');
+    return this._viewingAreaModel.isPlaying;
   }
 
   /**
@@ -101,14 +109,22 @@ export default class ViewingAreaController extends (EventEmitter as new () => Ty
    * Changing this value will emit a 'playbackChange' event to listeners
    */
   public set isPlaying(isPlaying: boolean) {
-    throw new Error('Unimplemented: Task 2 ViewingAreaController');
+    if (this._viewingAreaModel.isPlaying !== isPlaying) {
+      this._viewingAreaModel.isPlaying = isPlaying;
+      this.emit('playbackChange', isPlaying);
+    }
   }
 
   /**
    * @returns ViewingAreaModel that represents the current state of this ViewingAreaController
    */
   public viewingAreaModel(): ViewingAreaModel {
-    throw new Error('Unimplemented: Task 2 ViewingAreaController');
+    return {
+      id: this.id,
+      video: this.video,
+      isPlaying: this.isPlaying,
+      elapsedTimeSec: this.elapsedTimeSec,
+    };
   }
 
   /**

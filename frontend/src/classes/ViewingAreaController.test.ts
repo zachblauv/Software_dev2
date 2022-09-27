@@ -54,4 +54,73 @@ describe('Viewing Area Controller', () => {
       expect(testArea.id).toEqual(existingID);
     });
   });
+
+  describe('video', () => {
+    it('Does not update the video or emit event if the video passed is that same as the old one', () => {
+      const newVideo = testArea.video;
+      testArea.video = newVideo;
+      expect(mockListeners.videoChange).not.toBeCalled();
+      expect(testArea.video).toBe(newVideo);
+    });
+    it('Does not update the video if passed undefined if video is undefined', () => {
+      const viewingAreaModel = {
+        id: nanoid(),
+        video: undefined,
+        isPlaying: false,
+        elapsedTimeSec: 0,
+      };
+      const areaWithUndefinedTopic = new ViewingAreaController(viewingAreaModel);
+      areaWithUndefinedTopic.video = undefined;
+      expect(mockListeners.videoChange).not.toBeCalled();
+      expect(areaWithUndefinedTopic.video).toBe(undefined);
+    });
+    it('Updates video and emits videoChange event when passed a new video', () => {
+      const newVideo = 'funnyVideo';
+      testArea.video = newVideo;
+      expect(mockListeners.videoChange).toBeCalled();
+      expect(testArea.video).toBe(newVideo);
+    });
+    it('Updates video and emits topicChange event when passed undefined if video is defined', () => {
+      testArea.video = undefined;
+      expect(mockListeners.videoChange).toBeCalled();
+      expect(testArea.video).toBe(undefined);
+    });
+  });
+
+  describe('elapsedTimeSec', () => {
+    it('Does not update elapsedTimeSec or emit event if elapsedTimeSec is that same as the old one', () => {
+      testArea.elapsedTimeSec = 12;
+      expect(mockListeners.progressChange).not.toBeCalled();
+      expect(testArea.elapsedTimeSec).toBe(12);
+    });
+    it('Updates elapsedTimeSec and emits progressChange event when passed a new elapsedTimeSec', () => {
+      testArea.elapsedTimeSec = 100;
+      expect(mockListeners.progressChange).toBeCalled();
+      expect(testArea.elapsedTimeSec).toBe(100);
+    });
+  });
+
+  describe('isPlaying', () => {
+    it('Does not update isPlaying or emit event if isPlaying is that same as the old one', () => {
+      testArea.isPlaying = true;
+      expect(mockListeners.playbackChange).not.toBeCalled();
+      expect(testArea.isPlaying).toBe(true);
+    });
+    it('Updates isPlaying and emits playbackChange event when passed a new isPlaying value', () => {
+      testArea.isPlaying = false;
+      expect(mockListeners.playbackChange).toBeCalled();
+      expect(testArea.isPlaying).toBe(false);
+    });
+  });
+
+  describe('toViewingAreaModel', () => {
+    it('Succeeds on a filled out ViewingArea', () => {
+      expect(testArea.viewingAreaModel()).toEqual(testAreaModel);
+    });
+    it('Succeeds on a ConversationArea with no viedo', () => {
+      testArea.video = undefined;
+      testAreaModel.video = undefined;
+      expect(testArea.viewingAreaModel()).toEqual(testAreaModel);
+    });
+  });
 });

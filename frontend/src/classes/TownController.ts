@@ -15,6 +15,7 @@ import {
   PlayerLocation,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
+  ConversationArea as ConversationAreaModel,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea } from '../types/TypeUtils';
 import ConversationAreaController from './ConversationAreaController';
@@ -411,7 +412,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      * events (@see ViewingAreaController and @see ConversationAreaController)
      */
     this._socket.on('interactableUpdate', interactable => {
-      // TODO: Task 2
+      if (isConversationArea(interactable)) {
+        this._updateConversationArea(interactable as ConversationAreaModel);
+      } else {
+        this._updateViewingArea(interactable as ViewingAreaModel);
+      }
     });
   }
 
@@ -602,6 +607,29 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   private _playersByIDs(playerIDs: string[]): PlayerController[] {
     return this._playersInternal.filter(eachPlayer => playerIDs.includes(eachPlayer.id));
   }
+
+  private _updateConversationArea(conversationArea: ConversationAreaModel): void {
+    const areaController = this.conversationAreas.find(area => area.id === conversationArea.id);
+    if (areaController) {
+      if (areaController.isEmpty()) {
+        areaController.occupants = this._playersByIDs(conversationArea.occupantsByID);
+        areaController.topic = conversationArea.topic;
+        if (conversationArea.occupantsByID.length > 0 && conversationArea.topic !== undefined) {
+          this.emit('conversationAreasChanged', this.conversationAreas);
+        }
+      } else {
+        areaController.occupants = this._playersByIDs(conversationArea.occupantsByID);
+        areaController.topic = conversationArea.topic;
+        if (conversationArea.occupantsByID.length === 0 || conversationArea.topic === undefined) {
+          this.emit('conversationAreasChanged', this.conversationAreas);
+        }
+      }
+    }
+  }
+
+  private _updateViewingArea(viewingArea: ViewingAreaModel): void {
+    throw new Error('Unimplemented');
+  }
 }
 
 /**
@@ -660,7 +688,7 @@ export function useViewingAreaController(viewingAreaID: string): ViewingAreaCont
   const townController = useTownController();
   const ret = townController.viewingAreas.find(eachArea => eachArea.id === viewingAreaID);
   if (!ret) {
-    throw new Error(`Unable to locate viewing area id ${viewingAreaID}`)
+    throw new Error(`Unable to locate viewing area id ${viewingAreaID}`);
   }
   return ret;
 }

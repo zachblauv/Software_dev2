@@ -630,7 +630,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   private _updateViewingArea(viewingArea: ViewingAreaModel): void {
     const areaController = this.viewingAreas.find(area => area.id === viewingArea.id);
     if (areaController) {
-      areaController.updateFrom(viewingArea);
+      areaController.video = viewingArea.video;
+      areaController.elapsedTimeSec = viewingArea.elapsedTimeSec;
+      areaController.isPlaying = viewingArea.isPlaying;
     }
   }
 }
@@ -645,7 +647,31 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
  *  representing the current settings of the current town
  */
 export function useTownSettings(): { friendlyName: string; isPubliclyListed: boolean } {
-  throw new Error('Part 3: TownController hook not implemented');
+  const townController = useTownController();
+  const [townSettings, setTownSettings] = useState({
+    friendlyName: townController.friendlyName,
+    isPubliclyListed: townController.townIsPubliclyListed,
+  });
+  useEffect(() => {
+    const updateTownSettings = (newSettings: TownSettingsUpdate) => {
+      const friendlyName = newSettings.friendlyName
+        ? newSettings.friendlyName
+        : townController.friendlyName;
+      const isPubliclyListed =
+        newSettings.isPubliclyListed !== undefined
+          ? newSettings.isPubliclyListed
+          : townController.townIsPubliclyListed;
+      setTownSettings({
+        friendlyName,
+        isPubliclyListed,
+      });
+    };
+    townController.addListener('townSettingsUpdated', updateTownSettings);
+    return () => {
+      townController.removeListener('townSettingsUpdated', updateTownSettings);
+    };
+  }, [townController, setTownSettings]);
+  return townSettings;
 }
 
 /**

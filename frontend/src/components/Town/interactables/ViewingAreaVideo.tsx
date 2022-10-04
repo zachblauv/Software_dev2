@@ -38,6 +38,7 @@ export function ViewingAreaVideo({
 }: {
   controller: ViewingAreaController;
 }): JSX.Element {
+  const townController = useTownController();
   const reactPlayerRef = useRef<ReactPlayer>(null);
   const [isPlaying, setIsPlaying] = useState(controller.isPlaying);
   useEffect(() => {
@@ -64,7 +65,6 @@ export function ViewingAreaVideo({
       controller.removeListener('progressChange', updateTimecode);
     };
   }, [controller]);
-  // TODO: Task 4 - implement this component to the spec
   return (
     <Container className='participant-wrapper'>
       Viewing Area: {controller.id}
@@ -72,6 +72,30 @@ export function ViewingAreaVideo({
         ref={reactPlayerRef}
         url={controller.video}
         playing={isPlaying}
+        onProgress={state => {
+          if (controller.elapsedTimeSec !== state.playedSeconds) {
+            controller.elapsedTimeSec = state.playedSeconds;
+            townController.emitViewingAreaUpdate(controller);
+          }
+        }}
+        onPause={() => {
+          if (controller.isPlaying) {
+            controller.isPlaying = false;
+            townController.emitViewingAreaUpdate(controller);
+          }
+        }}
+        onPlay={() => {
+          if (!controller.isPlaying) {
+            controller.isPlaying = true;
+            townController.emitViewingAreaUpdate(controller);
+          }
+        }}
+        onEnded={() => {
+          if (controller.isPlaying) {
+            controller.isPlaying = false;
+            townController.emitViewingAreaUpdate(controller);
+          }
+        }}
         config={{
           youtube: {
             playerVars: {

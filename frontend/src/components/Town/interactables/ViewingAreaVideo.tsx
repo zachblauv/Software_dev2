@@ -30,7 +30,7 @@ export class MockReactPlayer extends ReactPlayer {
  * In response to these events, the ViewingAreaVideo updates the ViewingAreaController's properties, and
  * uses the TownController to emit a viewing area update.
  *
- * @param props: A single property 'controller', which is the ViewingAreaController corresponding to the 
+ * @param props: A single property 'controller', which is the ViewingAreaController corresponding to the
  *               current viewing area.
  */
 export function ViewingAreaVideo({

@@ -129,7 +129,17 @@ export default class ConversationAreaController extends (EventEmitter as new () 
  * This hook will re-render any components that use it when the set of occupants changes.
  */
 export function useConversationAreaOccupants(area: ConversationAreaController): PlayerController[] {
-  throw new Error('Unimplemented: Task 3 Hooks in ConversationAreaController');
+  const [occupants, setOccupants] = useState(area.occupants);
+  useEffect(() => {
+    const updateOccupants = (newOccupants: PlayerController[]) => {
+      setOccupants(newOccupants);
+    };
+    area.addListener('occupantsChange', updateOccupants);
+    return () => {
+      area.removeListener('occupantsChange', updateOccupants);
+    };
+  }, [area, setOccupants]);
+  return occupants;
 }
 
 /**
@@ -139,5 +149,16 @@ export function useConversationAreaOccupants(area: ConversationAreaController): 
  * This hook will re-render any components that use it when the topic changes.
  */
 export function useConversationAreaTopic(area: ConversationAreaController): string {
-  throw new Error('Unimplemented: Task 3 Hooks in ConversationAreaController');
+  const [topic, setTopic] = useState(area.topic ? area.topic : NO_TOPIC_STRING);
+  useEffect(() => {
+    const updateTopic = (newTopic: string | undefined) => {
+      const newTopicString = newTopic ? newTopic : NO_TOPIC_STRING;
+      setTopic(newTopicString);
+    };
+    area.addListener('topicChange', updateTopic);
+    return () => {
+      area.removeListener('topicChange', updateTopic);
+    };
+  }, [area, setTopic]);
+  return topic;
 }

@@ -39,12 +39,39 @@ export function ViewingAreaVideo({
   controller: ViewingAreaController;
 }): JSX.Element {
   const reactPlayerRef = useRef<ReactPlayer>(null);
+  const [isPlaying, setIsPlaying] = useState(controller.isPlaying);
+  useEffect(() => {
+    const updateIsPlaying = (newIsPlaying: boolean) => {
+      setIsPlaying(newIsPlaying);
+    };
+    controller.addListener('playbackChange', updateIsPlaying);
+    return () => {
+      controller.removeListener('playbackChange', updateIsPlaying);
+    };
+  }, [controller, setIsPlaying]);
+  useEffect(() => {
+    const updateTimecode = (newTime: integer) => {
+      if (reactPlayerRef.current) {
+        if (newTime > reactPlayerRef.current?.getCurrentTime() + ALLOWED_DRIFT) {
+          reactPlayerRef.current.seekTo(newTime, 'seconds');
+        } else if (newTime < reactPlayerRef.current?.getCurrentTime() - ALLOWED_DRIFT) {
+          reactPlayerRef.current.seekTo(newTime, 'seconds');
+        }
+      }
+    };
+    controller.addListener('progressChange', updateTimecode);
+    return () => {
+      controller.removeListener('progressChange', updateTimecode);
+    };
+  }, [controller]);
   // TODO: Task 4 - implement this component to the spec
   return (
     <Container className='participant-wrapper'>
       Viewing Area: {controller.id}
       <ReactPlayer
         ref={reactPlayerRef}
+        url={controller.video}
+        playing={isPlaying}
         config={{
           youtube: {
             playerVars: {

@@ -1,5 +1,4 @@
 import EventEmitter from 'events';
-import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import TypedEmitter from 'typed-emitter';
 import { ConversationArea as ConversationAreaModel } from '../types/CoveyTownSocket';

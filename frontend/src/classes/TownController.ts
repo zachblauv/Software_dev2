@@ -684,7 +684,22 @@ export function useTownSettings(): { friendlyName: string; isPubliclyListed: boo
  * @returns the list of conversation area controllers that are currently "active"
  */
 export function useActiveConversationAreas(): ConversationAreaController[] {
-  throw new Error('Part 3: TownController hook not implemented');
+  const townController = useTownController();
+  // Filter out empty ConversationAreas since they are not active
+  const activeConversationAreas = townController.conversationAreas.filter(area => !area.isEmpty());
+  const [conversationAreas, setConversationAreas] = useState(activeConversationAreas);
+  useEffect(() => {
+    const updateConversationAreas = (newConversationAreas: ConversationAreaController[]) => {
+      // Filter out empty ConversationAreas since they are not active
+      const newActiveConversationAreas = newConversationAreas.filter(area => !area.isEmpty());
+      setConversationAreas(newActiveConversationAreas);
+    };
+    townController.addListener('conversationAreasChanged', updateConversationAreas);
+    return () => {
+      townController.removeListener('conversationAreasChanged', updateConversationAreas);
+    };
+  }, [townController, setConversationAreas]);
+  return conversationAreas;
 }
 
 /**
@@ -699,7 +714,18 @@ export function useActiveConversationAreas(): ConversationAreaController[] {
  * @returns an array of PlayerController's, representing the current set of players in the town
  */
 export function usePlayers(): PlayerController[] {
-  throw new Error('Part 3: TownController hook not implemented');
+  const townController = useTownController();
+  const [players, setPlayers] = useState(townController.players);
+  useEffect(() => {
+    const updatePlayers = (newPlayers: PlayerController[]) => {
+      setPlayers(newPlayers);
+    };
+    townController.addListener('playersChanged', updatePlayers);
+    return () => {
+      townController.removeListener('playersChanged', updatePlayers);
+    };
+  }, [townController, setPlayers]);
+  return players;
 }
 
 /**

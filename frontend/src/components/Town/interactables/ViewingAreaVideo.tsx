@@ -14,6 +14,15 @@ export class MockReactPlayer extends ReactPlayer {
   }
 }
 
+function isTimeInDriftRange(newTime: integer, currentTime: integer): boolean {
+  if (newTime > currentTime + ALLOWED_DRIFT) {
+    return true;
+  } else if (newTime < currentTime - ALLOWED_DRIFT) {
+    return true;
+  }
+  return false;
+}
+
 /**
  * The ViewingAreaVideo component renders a ViewingArea's video, using the ReactPlayer component.
  * The URL property of the ReactPlayer is set to the ViewingAreaController's video property, and the isPlaying
@@ -41,6 +50,7 @@ export function ViewingAreaVideo({
   const townController = useTownController();
   const reactPlayerRef = useRef<ReactPlayer>(null);
   const [isPlaying, setIsPlaying] = useState(controller.isPlaying);
+  // Listen in for changes to if the video is playing.
   useEffect(() => {
     const updateIsPlaying = (newIsPlaying: boolean) => {
       setIsPlaying(newIsPlaying);
@@ -50,12 +60,11 @@ export function ViewingAreaVideo({
       controller.removeListener('playbackChange', updateIsPlaying);
     };
   }, [controller, setIsPlaying]);
+  // Listen in for chagnes in video progress and update only if the send time exceeds the drift from the current time.
   useEffect(() => {
     const updateTimecode = (newTime: integer) => {
       if (reactPlayerRef.current) {
-        if (newTime > reactPlayerRef.current?.getCurrentTime() + ALLOWED_DRIFT) {
-          reactPlayerRef.current.seekTo(newTime, 'seconds');
-        } else if (newTime < reactPlayerRef.current?.getCurrentTime() - ALLOWED_DRIFT) {
+        if (isTimeInDriftRange(newTime, reactPlayerRef.current?.getCurrentTime())) {
           reactPlayerRef.current.seekTo(newTime, 'seconds');
         }
       }
